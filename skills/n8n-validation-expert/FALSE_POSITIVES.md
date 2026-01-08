@@ -530,7 +530,7 @@ Many warnings are context-dependent:
 
 **Development**:
 ```javascript
-validate_node_operation({
+validate_node({
   nodeType: "nodes-base.slack",
   config,
   profile: "ai-friendly"  // Fewer warnings during development
@@ -539,7 +539,7 @@ validate_node_operation({
 
 **Pre-Production**:
 ```javascript
-validate_node_operation({
+validate_node({
   nodeType: "nodes-base.slack",
   config,
   profile: "runtime"  // Balanced validation
@@ -548,7 +548,7 @@ validate_node_operation({
 
 **Production Deployment**:
 ```javascript
-validate_node_operation({
+validate_node({
   nodeType: "nodes-base.slack",
   config,
   profile: "strict"  // All warnings, review each one

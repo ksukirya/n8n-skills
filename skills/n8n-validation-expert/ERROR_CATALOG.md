@@ -65,8 +65,8 @@ Common validation errors by priority:
 
 **How to identify required fields**:
 ```javascript
-// Use get_node_essentials to see what's required
-const info = get_node_essentials({
+// Use get_node to see what's required
+const info = get_node({
   nodeType: "nodes-base.slack"
 });
 // Check properties marked as "required": true
@@ -868,15 +868,15 @@ let config = {
   text: "Hello"
 };
 
-validate_node_operation({nodeType: "nodes-base.slack", config});
+validate_node({nodeType: "nodes-base.slack", config, profile: "runtime"});
 // ✅ Valid
 
 // Step 2: Add features one by one
 config.attachments = [...];
-validate_node_operation({nodeType: "nodes-base.slack", config});
+validate_node({nodeType: "nodes-base.slack", config, profile: "runtime"});
 
 config.blocks = [...];
-validate_node_operation({nodeType: "nodes-base.slack", config});
+validate_node({nodeType: "nodes-base.slack", config, profile: "runtime"});
 ```
 
 ### Pattern 2: Error Triage
@@ -903,14 +903,14 @@ result.suggestions.forEach(sug => {
 });
 ```
 
-### Pattern 3: Use get_node_essentials
+### Pattern 3: Use get_node
 
 **Problem**: Don't know what's required
 
 **Solution**:
 ```javascript
 // Before configuring, check requirements
-const info = get_node_essentials({
+const info = get_node({
   nodeType: "nodes-base.slack"
 });
 
@@ -927,7 +927,7 @@ info.properties.forEach(prop => {
 ## Summary
 
 **Most Common Errors**:
-1. `missing_required` (45%) - Always check get_node_essentials
+1. `missing_required` (45%) - Always check get_node
 2. `invalid_value` (28%) - Check allowed values
 3. `type_mismatch` (12%) - Use correct data types
 4. `invalid_expression` (8%) - Use Expression Syntax skill

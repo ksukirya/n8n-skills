@@ -35,8 +35,9 @@ Teaches architectural patterns for building n8n workflows. Provides structure, b
 
 **n8n-mcp tools**:
 - search_nodes (find nodes for patterns)
-- get_node_essentials (understand node operations)
+- get_node (understand node operations)
 - search_templates (find example workflows)
+- ai_agents_guide (AI pattern guidance)
 
 **Related skills**:
 - n8n MCP Tools Expert (find and configure nodes)
@@ -230,7 +231,7 @@ Use `search_templates` to find examples for your use case!
 
 **Node Discovery** (n8n MCP Tools Expert):
 4. Find nodes for pattern (search_nodes)
-5. Understand node operations (get_node_essentials)
+5. Understand node operations (get_node)
 
 **Implementation** (n8n Expression Syntax + Node Configuration):
 6. Write expressions ({{$json.body.field}})

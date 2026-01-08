@@ -6,7 +6,7 @@ Complete guide for finding and understanding n8n nodes.
 
 ## search_nodes (START HERE!)
 
-**Success Rate**: 99.9% | **Speed**: <20ms
+**Speed**: <20ms
 
 **Use when**: You know what you're looking for (keyword, service, use case)
 
@@ -15,7 +15,9 @@ Complete guide for finding and understanding n8n nodes.
 search_nodes({
   query: "slack",      // Required: search keywords
   mode: "OR",          // Optional: OR (default), AND, FUZZY
-  limit: 20           // Optional: max results (default 20, max 100)
+  limit: 20,           // Optional: max results (default 20)
+  source: "all",       // Optional: all, core, community, verified
+  includeExamples: false  // Optional: include template configs
 })
 ```
 
@@ -38,24 +40,38 @@ search_nodes({
 
 **Tips**:
 - Common searches: webhook, http, database, email, slack, google, ai
-- OR mode (default): matches any word
-- AND mode: requires all words
-- FUZZY mode: typo-tolerant (finds "slak" → Slack)
+- `OR` mode (default): matches any word
+- `AND` mode: requires all words
+- `FUZZY` mode: typo-tolerant (finds "slak" → Slack)
+- Use `source: "core"` for only built-in nodes
+- Use `includeExamples: true` for real-world configs
 
 ---
 
-## get_node_essentials (RECOMMENDED!)
+## get_node (UNIFIED NODE INFORMATION)
 
-**Success Rate**: 91.7% | **Speed**: <10ms | **Size**: ~5KB
+The `get_node` tool provides all node information with different detail levels and modes.
+
+### Detail Levels (mode="info")
+
+| Detail | Tokens | Use When |
+|--------|--------|----------|
+| `minimal` | ~200 | Quick metadata check |
+| `standard` | ~1-2K | **Most use cases (DEFAULT)** |
+| `full` | ~3-8K | Complex debugging only |
+
+### Standard Detail (RECOMMENDED)
+
+**Speed**: <10ms | **Size**: ~1-2K tokens
 
 **Use when**: You've found the node and need configuration details
 
-**Syntax**:
 ```javascript
-get_node_essentials({
+get_node({
   nodeType: "nodes-base.slack",      // Required: SHORT prefix format
   includeExamples: true              // Optional: get real template configs
 })
+// detail="standard" is the default
 ```
 
 **Returns**:
@@ -64,105 +80,161 @@ get_node_essentials({
 - Metadata (isAITool, isTrigger, hasCredentials)
 - Real examples from templates (if includeExamples: true)
 
-**Why use this**:
-- 5KB vs 100KB+ (get_node_info)
-- 91.7% success vs 80%
-- <10ms vs slower
-- Focused data (no information overload)
+### Minimal Detail
 
----
+**Speed**: <5ms | **Size**: ~200 tokens
 
-## get_node_info (USE SPARINGLY!)
+**Use when**: Just need basic metadata
 
-**Success Rate**: 80% ⚠️ | **Size**: 100KB+
-
-**Use when**:
-- Debugging complex configuration
-- Need complete property schema
-- Exploring advanced features
-
-**Syntax**:
 ```javascript
-get_node_info({
-  nodeType: "nodes-base.httpRequest"
+get_node({
+  nodeType: "nodes-base.slack",
+  detail: "minimal"
 })
 ```
 
-**Warning**: 20% failure rate! Use get_node_essentials instead for most cases.
+**Returns**: nodeType, displayName, description, category
 
-**Better alternatives**:
-1. get_node_essentials - operations list
-2. get_node_documentation - readable docs
-3. search_node_properties - specific property
+### Full Detail (USE SPARINGLY)
 
----
+**Speed**: <100ms | **Size**: ~3-8K tokens
 
-## list_nodes (BROWSE BY CATEGORY)
+**Use when**: Debugging complex configuration, need complete schema
 
-**Success Rate**: 99.6% | **Speed**: <20ms
-
-**Use when**: Exploring by category or listing all nodes
-
-**Syntax**:
 ```javascript
-list_nodes({
-  category: "trigger",        // Optional: filter by category
-  package: "n8n-nodes-base", // Optional: filter by package
-  limit: 200                 // Optional: default 50
-})
-```
-
-**Categories**:
-- `trigger` - Webhook, Schedule, Manual, etc. (108 total)
-- `transform` - Code, Set, Function, etc.
-- `output` - HTTP Request, Email, Slack, etc.
-- `input` - Read data sources
-- `AI` - AI-capable nodes (270 total)
-
-**Packages**:
-- `n8n-nodes-base` - Core nodes (437 total)
-- `@n8n/n8n-nodes-langchain` - AI nodes (100 total)
-
----
-
-## search_node_properties (FIND SPECIFIC FIELDS)
-
-**Use when**: Looking for specific property in a node
-
-**Syntax**:
-```javascript
-search_node_properties({
+get_node({
   nodeType: "nodes-base.httpRequest",
-  query: "auth"               // Find authentication properties
+  detail: "full"
 })
 ```
 
-**Returns**: Property paths and descriptions matching query
-
-**Common searches**: auth, header, body, json, url, method
+**Warning**: Large payload! Use `standard` for most cases.
 
 ---
 
-## get_node_documentation (READABLE DOCS)
+## get_node Modes
 
-**Coverage**: 88% of nodes (470/537)
+### mode="docs" (READABLE DOCUMENTATION)
 
 **Use when**: Need human-readable documentation with examples
 
-**Syntax**:
 ```javascript
-get_node_documentation({
-  nodeType: "nodes-base.slack"
+get_node({
+  nodeType: "nodes-base.slack",
+  mode: "docs"
 })
 ```
 
-**Returns**: Formatted docs with:
+**Returns**: Formatted markdown with:
 - Usage examples
 - Authentication guide
 - Common patterns
 - Best practices
 
-**Note**: Better than raw schema for learning!
+**Better than raw schema for learning!**
+
+### mode="search_properties" (FIND SPECIFIC FIELDS)
+
+**Use when**: Looking for specific property in a node
+
+```javascript
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "search_properties",
+  propertyQuery: "auth",           // Required for this mode
+  maxPropertyResults: 20           // Optional: default 20
+})
+```
+
+**Returns**: Property paths and descriptions matching query
+
+**Common searches**: auth, header, body, json, url, method, credential
+
+### mode="versions" (VERSION HISTORY)
+
+**Use when**: Need to check node version history
+
+```javascript
+get_node({
+  nodeType: "nodes-base.executeWorkflow",
+  mode: "versions"
+})
+```
+
+**Returns**: Version history with breaking changes flags
+
+### mode="compare" (COMPARE VERSIONS)
+
+**Use when**: Need to see differences between versions
+
+```javascript
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "compare",
+  fromVersion: "3.0",
+  toVersion: "4.1"       // Optional: defaults to latest
+})
+```
+
+**Returns**: Property-level changes between versions
+
+### mode="breaking" (BREAKING CHANGES ONLY)
+
+**Use when**: Checking for breaking changes before upgrades
+
+```javascript
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "breaking",
+  fromVersion: "3.0"
+})
+```
+
+**Returns**: Only breaking changes (not all changes)
+
+### mode="migrations" (AUTO-MIGRATABLE)
+
+**Use when**: Checking what can be auto-migrated
+
+```javascript
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "migrations",
+  fromVersion: "3.0"
+})
+```
+
+**Returns**: Changes that can be automatically migrated
+
+---
+
+## Additional Parameters
+
+### includeTypeInfo
+
+Add type structure metadata (validation rules, JS types)
+
+```javascript
+get_node({
+  nodeType: "nodes-base.if",
+  includeTypeInfo: true   // Adds ~80-120 tokens per property
+})
+```
+
+Use for complex nodes like filter, resourceMapper
+
+### includeExamples
+
+Include real-world configuration examples from templates
+
+```javascript
+get_node({
+  nodeType: "nodes-base.slack",
+  includeExamples: true   // Adds ~200-400 tokens per example
+})
+```
+
+Only works with `mode: "info"` and `detail: "standard"`
 
 ---
 
@@ -174,14 +246,14 @@ search_nodes({query: "slack"})
 → Returns: nodes-base.slack
 
 Step 2: Get Operations (18s avg thinking time)
-get_node_essentials({
+get_node({
   nodeType: "nodes-base.slack",
   includeExamples: true
 })
 → Returns: operations list + example configs
 
 Step 3: Validate Config
-validate_node_operation({
+validate_node({
   nodeType: "nodes-base.slack",
   config: {resource: "channel", operation: "create"},
   profile: "runtime"
@@ -192,21 +264,23 @@ Step 4: Use in Workflow
 (Configuration ready!)
 ```
 
-**Most common pattern**: search → essentials (18s average)
+**Most common pattern**: search → get_node (18s average)
 
 ---
 
 ## Quick Comparison
 
-| Tool | When to Use | Success | Speed | Size |
-|------|-------------|---------|-------|------|
-| search_nodes | Find by keyword | 99.9% | <20ms | Small |
-| get_node_essentials | Get config | 91.7% | <10ms | 5KB |
-| get_node_info | Full schema | 80% ⚠️ | Slow | 100KB+ |
-| list_nodes | Browse category | 99.6% | <20ms | Small |
-| get_node_documentation | Learn usage | N/A | Fast | Medium |
+| Tool/Mode | When to Use | Speed | Size |
+|-----------|-------------|-------|------|
+| `search_nodes` | Find by keyword | <20ms | Small |
+| `get_node (standard)` | **Get config (DEFAULT)** | <10ms | 1-2K |
+| `get_node (minimal)` | Quick metadata | <5ms | 200 |
+| `get_node (full)` | Complex debugging | <100ms | 3-8K |
+| `get_node (docs)` | Learn usage | Fast | Medium |
+| `get_node (search_properties)` | Find specific field | Fast | Small |
+| `get_node (versions)` | Check versions | Fast | Small |
 
-**Best Practice**: search → essentials → validate
+**Best Practice**: search → get_node(standard) → validate
 
 ---
 
@@ -229,9 +303,67 @@ Step 4: Use in Workflow
 **Conversion**: search_nodes returns BOTH formats:
 ```javascript
 {
-  "nodeType": "nodes-base.slack",          // Use with essentials
-  "workflowNodeType": "n8n-nodes-base.slack"  // Use with create_workflow
+  "nodeType": "nodes-base.slack",          // Use with get_node, validate_node
+  "workflowNodeType": "n8n-nodes-base.slack"  // Use with n8n_create_workflow
 }
+```
+
+---
+
+## Examples
+
+### Find and Configure HTTP Request
+
+```javascript
+// Step 1: Search
+search_nodes({query: "http request"})
+
+// Step 2: Get standard info
+get_node({nodeType: "nodes-base.httpRequest"})
+
+// Step 3: Find auth options
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "search_properties",
+  propertyQuery: "authentication"
+})
+
+// Step 4: Validate config
+validate_node({
+  nodeType: "nodes-base.httpRequest",
+  config: {method: "POST", url: "https://api.example.com"},
+  profile: "runtime"
+})
+```
+
+### Explore AI Nodes
+
+```javascript
+// Find all AI-related nodes
+search_nodes({query: "ai agent", source: "all"})
+
+// Get AI Agent documentation
+get_node({nodeType: "nodes-langchain.agent", mode: "docs"})
+
+// Get configuration details with examples
+get_node({
+  nodeType: "nodes-langchain.agent",
+  includeExamples: true
+})
+```
+
+### Check Version Compatibility
+
+```javascript
+// See all versions
+get_node({nodeType: "nodes-base.executeWorkflow", mode: "versions"})
+
+// Check breaking changes from v1 to v2
+get_node({
+  nodeType: "nodes-base.executeWorkflow",
+  mode: "breaking",
+  fromVersion: "1.0"
+})
 ```
 
 ---

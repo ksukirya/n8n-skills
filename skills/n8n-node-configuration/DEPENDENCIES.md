@@ -233,43 +233,27 @@ Deep dive into n8n property dependencies and displayOptions mechanism.
 
 ---
 
-## Using get_property_dependencies
+## Finding Property Dependencies
 
-### Basic Usage
+### Using get_node with search_properties Mode
 
 ```javascript
-const deps = get_property_dependencies({
-  nodeType: "nodes-base.httpRequest"
+// Find properties related to "body"
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "search_properties",
+  propertyQuery: "body"
 });
 ```
 
-### Example Response
+### Using get_node with Full Detail
 
 ```javascript
-{
-  "nodeType": "n8n-nodes-base.httpRequest",
-  "dependencies": {
-    "body": {
-      "shows_when": {
-        "sendBody": [true],
-        "method": ["POST", "PUT", "PATCH", "DELETE"]
-      },
-      "required_when_shown": true
-    },
-    "queryParameters": {
-      "shows_when": {
-        "sendQuery": [true]
-      },
-      "required_when_shown": false
-    },
-    "headerParameters": {
-      "shows_when": {
-        "sendHeaders": [true]
-      },
-      "required_when_shown": false
-    }
-  }
-}
+// Get complete schema with displayOptions
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  detail: "full"
+});
 ```
 
 ### When to Use
@@ -281,7 +265,7 @@ const deps = get_property_dependencies({
 - Building dynamic configuration tools
 
 **❌ Don't use when**:
-- Simple configuration (use get_node_essentials)
+- Simple configuration (use `get_node` with standard detail)
 - Just starting configuration
 - Field requirements are obvious
 
@@ -564,9 +548,11 @@ method=POST
 
 **Solution**:
 ```javascript
-// Check dependencies
-const deps = get_property_dependencies({
-  nodeType: "nodes-base.httpRequest"
+// Check field dependencies using search_properties
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "search_properties",
+  propertyQuery: "body"
 });
 
 // Find that body shows when sendBody=true
@@ -606,8 +592,8 @@ const deps = get_property_dependencies({
 
 **Solution**:
 ```javascript
-// Check essentials for new operation
-get_node_essentials({
+// Check requirements for new operation
+get_node({
   nodeType: "nodes-base.slack"
 });
 
@@ -644,9 +630,11 @@ get_node_essentials({
 **Solution**: Respect dependencies from the start
 
 ```javascript
-// Correct approach
-get_property_dependencies({
-  nodeType: "nodes-base.httpRequest"
+// Correct approach - check property dependencies
+get_node({
+  nodeType: "nodes-base.httpRequest",
+  mode: "search_properties",
+  propertyQuery: "body"
 });
 
 // See that body only shows for POST/PUT/PATCH/DELETE
@@ -730,7 +718,7 @@ get_property_dependencies({
 
 1. **Check dependencies when stuck**
    ```javascript
-   get_property_dependencies({nodeType: "..."});
+   get_node({nodeType: "...", mode: "search_properties", propertyQuery: "..."});
    ```
 
 2. **Configure parent properties first**
@@ -742,7 +730,7 @@ get_property_dependencies({
 3. **Validate after changing operation**
    ```javascript
    // Operation changed → requirements changed
-   validate_node_operation({...});
+   validate_node({nodeType: "...", config: {...}, profile: "runtime"});
    ```
 
 4. **Read validation errors for dependency hints**
@@ -791,8 +779,9 @@ get_property_dependencies({
 - Field doesn't save → Hidden by dependencies
 
 **Tools**:
-- `get_property_dependencies` - See dependency rules
-- `get_node_essentials` - See operation requirements
+- `get_node({mode: "search_properties"})` - Find property dependencies
+- `get_node({detail: "full"})` - See complete schema with displayOptions
+- `get_node` - See operation requirements (standard detail)
 - Validation errors - Hints about dependencies
 
 **Related Files**:

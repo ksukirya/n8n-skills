@@ -6,7 +6,7 @@ This folder contains distribution packages for different Claude platforms.
 
 ### Complete Bundle (Recommended)
 
-- **`n8n-mcp-skills-v1.0.0.zip`** (168 KB) - All 7 skills in one package
+- **`n8n-mcp-skills-v1.1.0.zip`** (172 KB) - All 7 skills in one package
 
 **Includes:**
 - Skill #1: n8n Expression Syntax
@@ -23,18 +23,18 @@ This folder contains distribution packages for different Claude platforms.
 /plugin install czlonkowski/n8n-skills
 
 # Or install from local file
-/plugin install /path/to/n8n-mcp-skills-v1.0.0.zip
+/plugin install /path/to/n8n-mcp-skills-v1.1.0.zip
 ```
 
 ### For Claude.ai Users (Individual Skills)
 
 Upload each skill separately via Settings → Capabilities → Skills (bottom of page):
 
-- `n8n-expression-syntax-v1.0.0.zip` - n8n expression syntax and common patterns
-- `n8n-mcp-tools-expert-v1.0.0.zip` - Expert guide for using n8n-mcp tools (recommended to install first)
-- `n8n-workflow-patterns-v1.0.0.zip` - 5 proven workflow architectural patterns
-- `n8n-validation-expert-v1.0.0.zip` - Validation error interpretation and fixing
-- `n8n-node-configuration-v1.0.0.zip` - Operation-aware node configuration
+- `n8n-expression-syntax-v1.1.0.zip` - n8n expression syntax and common patterns
+- `n8n-mcp-tools-expert-v1.1.0.zip` - Expert guide for using n8n-mcp tools (recommended to install first)
+- `n8n-workflow-patterns-v1.1.0.zip` - 5 proven workflow architectural patterns
+- `n8n-validation-expert-v1.1.0.zip` - Validation error interpretation and fixing
+- `n8n-node-configuration-v1.1.0.zip` - Operation-aware node configuration
 
 **Installation:**
 1. Go to Settings → Capabilities → Skills (bottom of page)
@@ -49,7 +49,7 @@ Upload each skill separately via Settings → Capabilities → Skills (bottom of
 | Platform | Package | What You Get |
 |----------|---------|--------------|
 | **Claude.ai** | Individual zips | 5 core skills (upload separately) |
-| **Claude Code** | Complete bundle (n8n-mcp-skills-v1.0.0.zip) | All 7 skills at once |
+| **Claude Code** | Complete bundle (n8n-mcp-skills-v1.1.0.zip) | All 7 skills at once |
 | **Claude API** | Complete bundle | All 7 skills (extract skills/ folder) |
 
 **Note:** Code skills (#6 JavaScript, #7 Python) are only in the complete bundle.
@@ -60,12 +60,12 @@ Upload each skill separately via Settings → Capabilities → Skills (bottom of
 
 ```
 dist/
-├── n8n-mcp-skills-v1.0.0.zip              (168 KB) ★ RECOMMENDED
-├── n8n-expression-syntax-v1.0.0.zip       (11 KB)
-├── n8n-mcp-tools-expert-v1.0.0.zip        (15 KB)
-├── n8n-workflow-patterns-v1.0.0.zip       (35 KB)
-├── n8n-validation-expert-v1.0.0.zip       (18 KB)
-├── n8n-node-configuration-v1.0.0.zip      (17 KB)
+├── n8n-mcp-skills-v1.1.0.zip              (168 KB) ★ RECOMMENDED
+├── n8n-expression-syntax-v1.1.0.zip       (11 KB)
+├── n8n-mcp-tools-expert-v1.1.0.zip        (15 KB)
+├── n8n-workflow-patterns-v1.1.0.zip       (35 KB)
+├── n8n-validation-expert-v1.1.0.zip       (18 KB)
+├── n8n-node-configuration-v1.1.0.zip      (17 KB)
 └── README.md                               (this file)
 ```
 

@@ -6,7 +6,7 @@ Complete guide for creating, updating, and managing n8n workflows.
 
 ## Tool Availability
 
-**⚠️ Requires n8n API**: All tools in this guide need `N8N_API_URL` and `N8N_API_KEY` configured.
+**Requires n8n API**: All tools in this guide need `N8N_API_URL` and `N8N_API_KEY` configured.
 
 If unavailable, use template examples and validation-only workflows.
 
@@ -14,7 +14,7 @@ If unavailable, use template examples and validation-only workflows.
 
 ## n8n_create_workflow
 
-**Success Rate**: 96.8% | **Speed**: 100-500ms
+**Speed**: 100-500ms
 
 **Use when**: Creating new workflows from scratch
 
@@ -39,7 +39,7 @@ n8n_create_workflow({
       id: "webhook-1",
       name: "Webhook",
       type: "n8n-nodes-base.webhook",  // Full prefix!
-      typeVersion: 1,
+      typeVersion: 2,
       position: [250, 300],
       parameters: {
         path: "slack-notify",
@@ -50,7 +50,7 @@ n8n_create_workflow({
       id: "slack-1",
       name: "Slack",
       type: "n8n-nodes-base.slack",
-      typeVersion: 1,
+      typeVersion: 2,
       position: [450, 300],
       parameters: {
         resource: "message",
@@ -69,7 +69,7 @@ n8n_create_workflow({
 ```
 
 **Notes**:
-- Workflows created **inactive** (must activate separately)
+- Workflows created **inactive** (activate with `activateWorkflow` operation)
 - Auto-sanitization runs on creation
 - Validate before creating for best results
 
@@ -77,26 +77,26 @@ n8n_create_workflow({
 
 ## n8n_update_partial_workflow (MOST USED!)
 
-**Success Rate**: 99.0% | **Speed**: 50-200ms | **Uses**: 38,287 (most used tool!)
+**Speed**: 50-200ms | **Uses**: 38,287 (most used tool!)
 
 **Use when**: Making incremental changes to workflows
 
 **Common pattern**: 56s average between edits (iterative building!)
 
-### 15 Operation Types
+### 17 Operation Types
 
 **Node Operations** (6 types):
 1. `addNode` - Add new node
 2. `removeNode` - Remove node by ID or name
-3. `updateNode` - Update node properties
+3. `updateNode` - Update node properties (use dot notation)
 4. `moveNode` - Change position
 5. `enableNode` - Enable disabled node
 6. `disableNode` - Disable active node
 
 **Connection Operations** (5 types):
-7. `addConnection` - Connect nodes
-8. `removeConnection` - Remove connection
-9. `rewireConnection` - Change target
+7. `addConnection` - Connect nodes (supports smart params)
+8. `removeConnection` - Remove connection (supports ignoreErrors)
+9. `rewireConnection` - Change connection target
 10. `cleanStaleConnections` - Auto-remove broken connections
 11. `replaceConnections` - Replace entire connections object
 
@@ -106,7 +106,23 @@ n8n_create_workflow({
 14. `addTag` - Add tag
 15. `removeTag` - Remove tag
 
-### Smart Parameters (NEW!)
+**Activation Operations** (2 types):
+16. `activateWorkflow` - Activate workflow for automatic execution
+17. `deactivateWorkflow` - Deactivate workflow
+
+### Intent Parameter (IMPORTANT!)
+
+Always include `intent` for better responses:
+
+```javascript
+n8n_update_partial_workflow({
+  id: "workflow-id",
+  intent: "Add error handling for API failures",  // Describe what you're doing
+  operations: [...]
+})
+```
+
+### Smart Parameters
 
 **IF nodes** - Use semantic branch names:
 ```javascript
@@ -182,11 +198,53 @@ n8n_create_workflow({
 // - ai_textSplitter
 ```
 
+### Property Removal with undefined
+
+Remove properties by setting them to `undefined`:
+
+```javascript
+// Remove a property
+{
+  type: "updateNode",
+  nodeName: "HTTP Request",
+  updates: { onError: undefined }
+}
+
+// Migrate from deprecated property
+{
+  type: "updateNode",
+  nodeName: "HTTP Request",
+  updates: {
+    continueOnFail: undefined,  // Remove old
+    onError: "continueErrorOutput"  // Add new
+  }
+}
+```
+
+### Activation Operations
+
+```javascript
+// Activate workflow
+n8n_update_partial_workflow({
+  id: "workflow-id",
+  intent: "Activate workflow for production",
+  operations: [{type: "activateWorkflow"}]
+})
+
+// Deactivate workflow
+n8n_update_partial_workflow({
+  id: "workflow-id",
+  intent: "Deactivate workflow for maintenance",
+  operations: [{type: "deactivateWorkflow"}]
+})
+```
+
 ### Example Usage
 
 ```javascript
 n8n_update_partial_workflow({
   id: "workflow-id",
+  intent: "Add transform node after IF condition",
   operations: [
     // Add node
     {
@@ -213,8 +271,16 @@ n8n_update_partial_workflow({
 
 **cleanStaleConnections** - Remove broken connections:
 ```javascript
+{type: "cleanStaleConnections"}
+```
+
+**rewireConnection** - Change target atomically:
+```javascript
 {
-  type: "cleanStaleConnections"
+  type: "rewireConnection",
+  source: "Webhook",
+  from: "Old Handler",
+  to: "New Handler"
 }
 ```
 
@@ -227,15 +293,145 @@ n8n_update_partial_workflow({
 })
 ```
 
+**Validate before applying**:
+```javascript
+n8n_update_partial_workflow({
+  id: "workflow-id",
+  operations: [...],
+  validateOnly: true  // Preview without applying
+})
+```
+
+---
+
+## n8n_deploy_template (QUICK START!)
+
+**Speed**: 200-500ms
+
+**Use when**: Deploying a template directly to n8n instance
+
+```javascript
+n8n_deploy_template({
+  templateId: 2947,  // Required: from n8n.io
+  name: "My Weather to Slack",  // Optional: custom name
+  autoFix: true,  // Default: auto-fix common issues
+  autoUpgradeVersions: true,  // Default: upgrade node versions
+  stripCredentials: true  // Default: remove credential refs
+})
+```
+
+**Returns**:
+- Workflow ID
+- Required credentials
+- Fixes applied
+
+**Example**:
+```javascript
+// Deploy a webhook to Slack template
+const result = n8n_deploy_template({
+  templateId: 2947,
+  name: "Production Slack Notifier"
+});
+
+// Result includes:
+// - id: "new-workflow-id"
+// - requiredCredentials: ["slack"]
+// - fixesApplied: ["typeVersion upgraded", "expression format fixed"]
+```
+
+---
+
+## n8n_workflow_versions (VERSION CONTROL)
+
+**Use when**: Managing workflow history, rollback, cleanup
+
+### List Versions
+```javascript
+n8n_workflow_versions({
+  mode: "list",
+  workflowId: "workflow-id",
+  limit: 10
+})
+```
+
+### Get Specific Version
+```javascript
+n8n_workflow_versions({
+  mode: "get",
+  versionId: 123
+})
+```
+
+### Rollback to Previous Version
+```javascript
+n8n_workflow_versions({
+  mode: "rollback",
+  workflowId: "workflow-id",
+  versionId: 123,  // Optional: specific version
+  validateBefore: true  // Default: validate before rollback
+})
+```
+
+### Delete Versions
+```javascript
+// Delete specific version
+n8n_workflow_versions({
+  mode: "delete",
+  workflowId: "workflow-id",
+  versionId: 123
+})
+
+// Delete all versions for workflow
+n8n_workflow_versions({
+  mode: "delete",
+  workflowId: "workflow-id",
+  deleteAll: true
+})
+```
+
+### Prune Old Versions
+```javascript
+n8n_workflow_versions({
+  mode: "prune",
+  workflowId: "workflow-id",
+  maxVersions: 10  // Keep 10 most recent
+})
+```
+
+---
+
+## n8n_test_workflow (TRIGGER EXECUTION)
+
+**Use when**: Testing workflow execution
+
+**Auto-detects** trigger type (webhook, form, chat)
+
+```javascript
+// Test webhook workflow
+n8n_test_workflow({
+  workflowId: "workflow-id",
+  triggerType: "webhook",  // Optional: auto-detected
+  httpMethod: "POST",
+  data: {message: "Hello!"},
+  waitForResponse: true,
+  timeout: 120000
+})
+
+// Test chat workflow
+n8n_test_workflow({
+  workflowId: "workflow-id",
+  triggerType: "chat",
+  message: "Hello, AI agent!",
+  sessionId: "session-123"  // For conversation continuity
+})
+```
+
 ---
 
 ## n8n_validate_workflow (by ID)
 
-**Success Rate**: 99.7% | **Speed**: Network-dependent
-
 **Use when**: Validating workflow stored in n8n
 
-**Syntax**:
 ```javascript
 n8n_validate_workflow({
   id: "workflow-id",
@@ -248,7 +444,69 @@ n8n_validate_workflow({
 })
 ```
 
-**Returns**: Same as validate_workflow (from validation guide)
+---
+
+## n8n_get_workflow
+
+**Use when**: Retrieving workflow details
+
+**Modes**:
+- `full` (default) - Complete workflow JSON
+- `details` - Full + execution stats
+- `structure` - Nodes + connections only
+- `minimal` - ID, name, active, tags
+
+```javascript
+// Full workflow
+n8n_get_workflow({id: "workflow-id"})
+
+// Just structure
+n8n_get_workflow({id: "workflow-id", mode: "structure"})
+
+// Minimal metadata
+n8n_get_workflow({id: "workflow-id", mode: "minimal"})
+```
+
+---
+
+## n8n_executions (EXECUTION MANAGEMENT)
+
+**Use when**: Managing workflow executions
+
+### Get Execution Details
+```javascript
+n8n_executions({
+  action: "get",
+  id: "execution-id",
+  mode: "summary"  // preview, summary, filtered, full, error
+})
+
+// Error mode for debugging
+n8n_executions({
+  action: "get",
+  id: "execution-id",
+  mode: "error",
+  includeStackTrace: true
+})
+```
+
+### List Executions
+```javascript
+n8n_executions({
+  action: "list",
+  workflowId: "workflow-id",
+  status: "error",  // success, error, waiting
+  limit: 100
+})
+```
+
+### Delete Execution
+```javascript
+n8n_executions({
+  action: "delete",
+  id: "execution-id"
+})
+```
 
 ---
 
@@ -265,61 +523,45 @@ n8n_validate_workflow({
    → Check for errors
 
 3. EDIT (iterative! 56s avg between edits)
-   n8n_update_partial_workflow({id, operations: [...]})
+   n8n_update_partial_workflow({id, intent: "...", operations: [...]})
    → Make changes
 
 4. VALIDATE AGAIN
    n8n_validate_workflow({id})
    → Verify changes
 
-5. ACTIVATE (when ready)
-   ⚠️ **IMPORTANT LIMITATION**: Workflow activation is NOT supported via API or MCP.
-   Users must activate workflows manually in the n8n UI.
-
-   The following operation will NOT activate the workflow:
-   n8n_update_partial_workflow({id, operations: [{
-     type: "updateSettings",
-     settings: {active: true}
-   }]})
-
-   **Manual activation required**: Navigate to workflow in n8n UI and toggle activation.
+5. ACTIVATE
+   n8n_update_partial_workflow({
+     id,
+     intent: "Activate workflow",
+     operations: [{type: "activateWorkflow"}]
+   })
+   → Workflow now runs on triggers!
 
 6. MONITOR
-   n8n_list_executions({workflowId: id})
-   n8n_get_execution({id: execution_id})
+   n8n_executions({action: "list", workflowId: id})
+   n8n_executions({action: "get", id: execution_id})
 ```
-
-**Deployment Note**: After creating and validating workflows via MCP, inform users they must:
-1. Open the workflow in n8n UI (provide workflow ID)
-2. Review the workflow configuration
-3. Manually activate the workflow using the activation toggle
 
 ---
 
 ## Common Patterns from Telemetry
 
 ### Pattern 1: Edit → Validate (7,841 occurrences)
-
 ```javascript
-// Edit
 n8n_update_partial_workflow({...})
 // ↓ 23s (thinking about what to validate)
-// Validate
 n8n_validate_workflow({id})
 ```
 
 ### Pattern 2: Validate → Fix (7,266 occurrences)
-
 ```javascript
-// Validate
 n8n_validate_workflow({id})
 // ↓ 58s (fixing errors)
-// Fix
 n8n_update_partial_workflow({...})
 ```
 
 ### Pattern 3: Iterative Building (31,464 occurrences)
-
 ```javascript
 update → update → update → ... (56s avg between edits)
 ```
@@ -328,51 +570,24 @@ update → update → update → ... (56s avg between edits)
 
 ---
 
-## Retrieval Tools
-
-### n8n_get_workflow
-```javascript
-n8n_get_workflow({id: "workflow-id"})
-// Returns: Complete workflow JSON
-```
-
-### n8n_get_workflow_structure
-```javascript
-n8n_get_workflow_structure({id: "workflow-id"})
-// Returns: Nodes + connections only (no parameters)
-```
-
-### n8n_get_workflow_minimal
-```javascript
-n8n_get_workflow_minimal({id: "workflow-id"})
-// Returns: ID, name, active, tags only (fast!)
-```
-
-### n8n_list_workflows
-```javascript
-n8n_list_workflows({
-  active: true,  // Optional: filter by status
-  limit: 100,    // Optional: max results
-  tags: ["production"]  // Optional: filter by tags
-})
-```
-
----
-
 ## Best Practices
 
-### ✅ Do
+### Do
 
 - Build workflows **iteratively** (avg 56s between edits)
+- Include **intent** parameter for better responses
 - Use **smart parameters** (branch, case) for clarity
 - Validate **after** significant changes
 - Use **atomic mode** (default) for critical updates
 - Specify **sourceOutput** for AI connections
 - Clean stale connections after node renames/deletions
+- Use `n8n_deploy_template` for quick starts
+- Activate workflows via API when ready
 
-### ❌ Don't
+### Don't
 
 - Try to build workflows in one shot
+- Skip the intent parameter
 - Use sourceIndex when branch/case available
 - Skip validation before activation
 - Forget to test workflows after creation
@@ -383,12 +598,20 @@ n8n_list_workflows({
 ## Summary
 
 **Most Important**:
-1. **n8n_update_partial_workflow** is most-used tool (38,287 uses, 99.0% success)
-2. Workflows built **iteratively** (56s avg between edits)
-3. Use **smart parameters** (branch="true", case=0) for clarity
-4. **AI connections** supported (8 types with sourceOutput)
-5. **Auto-sanitization** runs on all operations
-6. Validate frequently (7,841 edit → validate patterns)
+1. **n8n_update_partial_workflow** is most-used tool (38,287 uses)
+2. Include **intent** parameter for better responses
+3. Workflows built **iteratively** (56s avg between edits)
+4. Use **smart parameters** (branch="true", case=0) for clarity
+5. **AI connections** supported (8 types with sourceOutput)
+6. **Workflow activation** supported via API (`activateWorkflow` operation)
+7. **Auto-sanitization** runs on all operations
+8. Use **n8n_deploy_template** for quick starts
+
+**New Tools**:
+- `n8n_deploy_template` - Deploy templates directly
+- `n8n_workflow_versions` - Version control & rollback
+- `n8n_test_workflow` - Trigger execution
+- `n8n_executions` - Manage executions
 
 **Related**:
 - [SEARCH_GUIDE.md](SEARCH_GUIDE.md) - Find nodes to add
