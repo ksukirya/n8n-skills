@@ -33,7 +33,7 @@ These skills solve these problems by teaching Claude:
 
 ---
 
-## 📚 The 7 Skills
+## 📚 The 8 Skills
 
 ### 1. **n8n Expression Syntax**
 Teaches correct n8n expression syntax and common patterns.
@@ -120,6 +120,21 @@ Write Python code in n8n Code nodes with proper limitations awareness.
 - Standard library reference (json, datetime, re, etc.)
 - Workarounds for missing libraries
 - Common Python patterns for n8n
+
+### 8. **n8n Workflow Builder** (NEW)
+Comprehensive single-reference skill for building n8n workflows.
+
+**Activates when**: Building new workflows, writing expressions, configuring webhooks, working with Code nodes, setting up error handling.
+
+**Key Features**:
+- Complete data structure reference
+- Expression cheat sheet with webhook patterns
+- Code node templates (JavaScript and Python)
+- Webhook configuration guide
+- Error handling patterns
+- Quick reference tables
+
+**Reference Documentation**: Full n8n docs available in `n8n-docs/` folder (cloned from official repo)
 
 ---
 
@@ -276,11 +291,12 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📊 What's Included
 
-- **7** complementary skills that work together
+- **8** complementary skills that work together
 - **525+** n8n nodes supported
 - **2,653+** workflow templates for examples
 - **10** production-tested Code node patterns
 - **Comprehensive** error catalogs and troubleshooting guides
+- **Full n8n documentation** cloned as reference (`n8n-docs/`)
 
 ---
 

@@ -1,0 +1,15 @@
+{
+  "name": "n8n-workflow-builder",
+  "description": "Build n8n workflows correctly with proper node syntax, expressions, error handling, and webhook setup",
+  "version": "1.0.0",
+  "triggers": [
+    "n8n workflow",
+    "n8n expression",
+    "n8n webhook",
+    "n8n code node",
+    "n8n error handling",
+    "build n8n",
+    "create n8n workflow"
+  ],
+  "referenceDocs": "n8n-docs/docs"
+}
