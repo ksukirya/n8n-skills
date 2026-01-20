@@ -1,12 +1,19 @@
+---
+name: obsidian-vault
+description: Expert guidance for reading and writing markdown files in Obsidian with proper frontmatter, backlinks, tags, and note structure.
+---
+
 # Obsidian Vault Skill
 
 Expert guidance for reading and writing markdown files in Obsidian with proper frontmatter, backlinks, tags, and note structure.
 
 ## Vault Location
 
-**Path:** `C:\Users\Keshav\Documents\ObsidianVault`
+**Default Path:** `~/Documents/ObsidianVault`
 
-Always use this path when reading or writing notes.
+> **Configuration:** Set your vault path in the `vaultPath` field of `skill.json` or use the environment variable `OBSIDIAN_VAULT_PATH`.
+
+For this installation: `C:\Users\Keshav\Documents\ObsidianVault`
 
 ---
 
@@ -646,11 +653,19 @@ priority: high | medium | low
 
 ```bash
 # Find all active projects
-Grep("status: in-progress", "C:/Users/Keshav/Documents/ObsidianVault/02-Projects")
+Grep("status: in-progress", "~/Documents/ObsidianVault/02-Projects")
 
 # Find blocked projects
-Grep("status: blocked", "C:/Users/Keshav/Documents/ObsidianVault/02-Projects")
+Grep("status: blocked", "~/Documents/ObsidianVault/02-Projects")
 
 # Find all project files
-Glob("C:/Users/Keshav/Documents/ObsidianVault/02-Projects/*.md")
+Glob("~/Documents/ObsidianVault/02-Projects/*.md")
 ```
+
+---
+
+## Related Skills
+
+- **subagent-orchestrator**: Use Documentation Agent to generate notes automatically
+- **n8n-expression-syntax**: Build n8n workflows that process Obsidian notes
+- **n8n-mcp-tools-expert**: Create automation workflows for note management

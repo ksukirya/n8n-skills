@@ -1,3 +1,8 @@
+---
+name: subagent-orchestrator
+description: Expert guidance for spawning, managing, and coordinating background task subagents in Claude Code for research, documentation, code review, and n8n workflow building.
+---
+
 # Subagent Orchestrator Skill
 
 Expert guidance for spawning, managing, and coordinating background task subagents in Claude Code.
@@ -657,3 +662,12 @@ Read(output_file)
 // or
 TaskOutput({ task_id: "id", block: false })
 ```
+
+---
+
+## Related Skills
+
+- **obsidian-vault**: Save research and documentation to Obsidian notes
+- **n8n-mcp-tools-expert**: Use n8n Workflow Builder Agent to create automations
+- **n8n-expression-syntax**: Reference for n8n expression patterns in workflows
+- **n8n-validation-expert**: Validate workflows built by agents
