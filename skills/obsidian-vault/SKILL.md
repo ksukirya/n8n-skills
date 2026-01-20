@@ -589,3 +589,68 @@ type: note
 > [!info] Info
 > Additional context
 ```
+
+---
+
+## Project Tracking
+
+### Projects Dashboard
+
+Location: `02-Projects/Projects Dashboard.md`
+
+The dashboard provides an overview of all projects with status tracking.
+
+### Project Status Values
+
+Use these in frontmatter `status` field:
+
+| Status | Emoji | Description |
+|--------|-------|-------------|
+| `not-started` | ⚪ | Planned but not begun |
+| `in-progress` | 🟡 | Actively working on |
+| `on-hold` | 🟠 | Paused temporarily |
+| `blocked` | 🔴 | Waiting on dependency |
+| `complete` | 🟢 | Finished |
+
+### Project Frontmatter
+
+```yaml
+---
+title: Project Name
+created: YYYY-MM-DD
+modified: YYYY-MM-DD
+tags:
+  - project
+  - project/active
+type: project
+status: in-progress
+priority: high | medium | low
+---
+```
+
+### Creating a New Project
+
+1. Create note in `02-Projects/` folder
+2. Use frontmatter with status and priority
+3. Add link to [[Projects Dashboard]]
+4. Update dashboard table with new project
+
+### Updating Project Status
+
+1. Change `status` field in frontmatter
+2. Update `modified` date
+3. Move project row in dashboard to appropriate section
+4. Add note in project's Notes section explaining change
+
+### Finding Projects by Status
+
+```bash
+# Find all active projects
+Grep("status: in-progress", "C:/Users/Keshav/Documents/ObsidianVault/02-Projects")
+
+# Find blocked projects
+Grep("status: blocked", "C:/Users/Keshav/Documents/ObsidianVault/02-Projects")
+
+# Find all project files
+Glob("C:/Users/Keshav/Documents/ObsidianVault/02-Projects/*.md")
+```
