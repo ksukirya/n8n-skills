@@ -1,0 +1,18 @@
+{
+  "name": "obsidian-vault",
+  "description": "Read and write Obsidian markdown notes with proper frontmatter, backlinks, tags, and note structure",
+  "version": "1.0.0",
+  "triggers": [
+    "obsidian",
+    "vault",
+    "note",
+    "daily note",
+    "frontmatter",
+    "backlink",
+    "markdown note",
+    "create note",
+    "meeting note",
+    "project note"
+  ],
+  "vaultPath": "C:\\Users\\Keshav\\Documents\\ObsidianVault"
+}
