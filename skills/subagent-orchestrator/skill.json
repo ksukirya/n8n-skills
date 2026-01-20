@@ -1,0 +1,16 @@
+{
+  "name": "subagent-orchestrator",
+  "description": "Spawn and coordinate background task subagents for research, documentation, code review, and n8n workflow building",
+  "version": "1.0.0",
+  "triggers": [
+    "subagent",
+    "spawn agent",
+    "background task",
+    "research agent",
+    "documentation agent",
+    "code review agent",
+    "parallel tasks",
+    "orchestrate",
+    "delegate task"
+  ]
+}
